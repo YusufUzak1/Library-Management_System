@@ -43,7 +43,9 @@ kutuphane-otomasyonu/
 
 ## ✨ Temel Özellikler
 
-### 1. 🛡️ Rol Tabanlı Giriş ve Güvenlik (RBAC)
+### 1. 🛡️ Rol Tabanlı Giriş, Güvenlik ve Kullanıcı Kayıt Sistemi (RBAC & Self-Registration)
+- **Yeni Kullanıcı Kaydı (Self-Registration):** Yeni okuyucular/öğrenciler giriş ekranındaki "Hemen Kayıt Olun" alanından Ad-Soyad, Kullanıcı Adı, E-posta, Telefon, Üye Türü (Öğrenci, Akademik, Personel) ve Şifre ile sisteme anında kayıt olabilir.
+- **Otomatik Üye Entegrasyonu:** Kayıt olan her kullanıcı için sistem otomatik olarak benzersiz kütüphane üye numarası (`FU-2026-XXXX`) tanımlar, veritabanına ve aktivite günlüğüne kaydeder.
 - **Yönetici (Admin) Modu:** Tüm kütüphane envanterini, üye verilerini, ödünç hareketlerini ve sistem loglarını tam yetkiyle yönetir.
 - **Kullanıcı / Kiosk Modu:** Ziyaretçilerin kitap araması yapabileceği, mevcut durumları inceleyebileceği ve kendi adlarına hızlı ödünç işlemi gerçekleştirebileceği modern self-servis arayüz.
 
@@ -157,3 +159,4 @@ Sistem ilk açılışta aşağıdaki demo kullanıcılarıyla doğrudan test edi
 
 ---
 *Bu proje modern yazılım mimarisi prensipleri ve kurumsal standartlara sadık kalınarak hazırlanmıştır.*
+

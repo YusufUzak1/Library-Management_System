@@ -29,6 +29,10 @@ public interface ILibraryDataService
     bool ProcessReturn(int loanId, out string summaryMessage);
     bool RenewLoan(int loanId, int extraDays, out string summaryMessage);
 
+    UserAccount? AuthenticateUser(string username, string password);
+    bool RegisterUser(UserAccount account, out string errorMessage);
+    IReadOnlyList<UserAccount> GetUsers();
+
     bool SyncFromDatabase();
     bool IsDatabaseConnected { get; }
     string DatabaseStatusText { get; }

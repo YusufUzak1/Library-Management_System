@@ -107,3 +107,16 @@ public class MonthlyBorrowStat
     public double NormalizedHeight { get; set; }
 }
 
+public class UserAccount
+{
+    public int Id { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
+    public string Role { get; set; } = "User"; // "Admin" veya "User"
+    public string Email { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
+    public string MemberType { get; set; } = "Öğrenci";
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+}
+

@@ -11,6 +11,7 @@ public sealed class LibraryDataService : ILibraryDataService
     private readonly List<ActiveLoanRecord> _loans = new();
     private readonly List<ReservationRecord> _reservations = new();
     private readonly List<ActivityLogEntry> _activities = new();
+    private readonly List<UserAccount> _users = new();
     private readonly object _lock = new();
     private readonly MariaDbManager _mariaDb = new();
 
@@ -19,6 +20,7 @@ public sealed class LibraryDataService : ILibraryDataService
 
     public LibraryDataService()
     {
+        LoadUsersFromLocalCache();
         if (_mariaDb.Initialize())
         {
             SyncFromDatabase();
@@ -48,6 +50,7 @@ public sealed class LibraryDataService : ILibraryDataService
             var dbLoans = _mariaDb.LoadActiveLoans();
             var dbActs = _mariaDb.LoadActivityLogs();
             var dbRes = _mariaDb.LoadReservations();
+            var dbUsers = _mariaDb.LoadUsers();
 
             lock (_lock)
             {
@@ -75,6 +78,11 @@ public sealed class LibraryDataService : ILibraryDataService
                 {
                     _reservations.Clear();
                     _reservations.AddRange(dbRes);
+                }
+                if (dbUsers != null && dbUsers.Count > 0)
+                {
+                    _users.Clear();
+                    _users.AddRange(dbUsers);
                 }
             }
             return true;
@@ -252,6 +260,16 @@ public sealed class LibraryDataService : ILibraryDataService
             new Member { Id = 3, MemberNumber = "FU-2026-1003", FullName = "Zeynep Demir", Email = "zeynep.demir@ogrenci.firat.edu.tr", PhoneNumber = "0543 333 4455", TierTitle = "Lisans Öğrencisi" },
             new Member { Id = 4, MemberNumber = "FU-2026-1004", FullName = "Mehmet Çelik", Email = "mcelik@firat.edu.tr", PhoneNumber = "0505 444 5566", TierTitle = "Araştırma Görevlisi" }
         });
+
+        if (_users.Count == 0)
+        {
+            _users.AddRange(new[]
+            {
+                new UserAccount { Id = 1, Username = "admin", Password = "1234", FullName = "Sistem Yöneticisi", Role = "Admin", Email = "admin@kutuphane.edu.tr", MemberType = "Personel" },
+                new UserAccount { Id = 2, Username = "kullanici", Password = "1234", FullName = "Örnek Öğrenci", Role = "User", Email = "ogrenci@kutuphane.edu.tr", MemberType = "Öğrenci" },
+                new UserAccount { Id = 3, Username = "yusuf", Password = "1234", FullName = "Yusuf Uzak", Role = "Admin", Email = "yusuf@firat.edu.tr", MemberType = "Personel" }
+            });
+        }
 
         _loans.AddRange(new[]
         {
@@ -532,6 +550,141 @@ public sealed class LibraryDataService : ILibraryDataService
 
             summaryMessage = $"{loan.BookTitle} ödünç süresi {extraDays} gün uzatıldı.";
             return true;
+        }
+    }
+
+    public IReadOnlyList<UserAccount> GetUsers()
+    {
+        lock (_lock) return _users.ToList();
+    }
+
+    public UserAccount? AuthenticateUser(string username, string password)
+    {
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrEmpty(password)) return null;
+        lock (_lock)
+        {
+            var u = _users.FirstOrDefault(x => string.Equals(x.Username, username.Trim(), StringComparison.OrdinalIgnoreCase));
+            if (u != null && u.Password == password)
+            {
+                return u;
+            }
+            return null;
+        }
+    }
+
+    public bool RegisterUser(UserAccount account, out string errorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(account.Username) || account.Username.Trim().Length < 3)
+        {
+            errorMessage = "Kullanıcı adı en az 3 karakter olmalıdır.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(account.Password) || account.Password.Length < 4)
+        {
+            errorMessage = "Şifre en az 4 karakter olmalıdır.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(account.FullName))
+        {
+            errorMessage = "Lütfen ad ve soyadınızı giriniz.";
+            return false;
+        }
+
+        lock (_lock)
+        {
+            string uname = account.Username.Trim();
+            if (_users.Any(u => string.Equals(u.Username, uname, StringComparison.OrdinalIgnoreCase)))
+            {
+                errorMessage = "Bu kullanıcı adı zaten kullanılmaktadır.";
+                return false;
+            }
+
+            account.Id = _users.Count > 0 ? _users.Max(u => u.Id) + 1 : 1;
+            account.Username = uname;
+            account.CreatedAt = DateTime.Now;
+            if (string.IsNullOrWhiteSpace(account.Role)) account.Role = "User";
+            if (string.IsNullOrWhiteSpace(account.MemberType)) account.MemberType = "Öğrenci";
+
+            _users.Add(account);
+
+            // Kütüphane üyesi olarak da ekle (Kiosk ile ödünç alabilmesi için)
+            var existingMember = _members.FirstOrDefault(m => string.Equals(m.FullName, account.FullName, StringComparison.OrdinalIgnoreCase));
+            if (existingMember == null)
+            {
+                var newMem = new Member
+                {
+                    Id = _members.Count > 0 ? _members.Max(m => m.Id) + 1 : 1,
+                    MemberNumber = $"FU-2026-{1000 + account.Id}",
+                    FullName = account.FullName,
+                    Email = string.IsNullOrWhiteSpace(account.Email) ? $"{account.Username}@ogrenci.firat.edu.tr" : account.Email,
+                    PhoneNumber = string.IsNullOrWhiteSpace(account.PhoneNumber) ? "0555 000 0000" : account.PhoneNumber,
+                    TierTitle = account.MemberType,
+                    Status = MemberStatus.Active,
+                    MaxLoanLimit = 5,
+                    RegistrationDate = DateTime.Now
+                };
+                _members.Add(newMem);
+                _ = Task.Run(() => _mariaDb.SaveNewMember(newMem));
+            }
+
+            // Sistem aktivite logu
+            var act = new ActivityLogEntry
+            {
+                Id = _activities.Count > 0 ? _activities.Max(a => a.Id) + 1 : 1,
+                Title = "Yeni Kullanıcı Kaydı",
+                Description = $"{account.FullName} ({account.Username}) sisteme kaydoldu.",
+                ActorName = account.FullName,
+                Timestamp = DateTime.Now,
+                AccentTag = "Emerald"
+            };
+            _activities.Insert(0, act);
+            _ = Task.Run(() => _mariaDb.AddActivityLog(act.Title, act.Description, act.ActorName));
+            _ = Task.Run(() => _mariaDb.SaveUser(account));
+            SaveUsersToLocalCache();
+        }
+
+        errorMessage = string.Empty;
+        return true;
+    }
+
+    private void LoadUsersFromLocalCache()
+    {
+        try
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "users_cache.json");
+            if (File.Exists(path))
+            {
+                string json = File.ReadAllText(path);
+                var cached = System.Text.Json.JsonSerializer.Deserialize<List<UserAccount>>(json);
+                if (cached != null && cached.Count > 0)
+                {
+                    lock (_lock)
+                    {
+                        _users.Clear();
+                        _users.AddRange(cached);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"LoadUsersFromLocalCache error: {ex.Message}");
+        }
+    }
+
+    private void SaveUsersToLocalCache()
+    {
+        try
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "users_cache.json");
+            string json = System.Text.Json.JsonSerializer.Serialize(_users, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(path, json);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"SaveUsersToLocalCache error: {ex.Message}");
         }
     }
 }

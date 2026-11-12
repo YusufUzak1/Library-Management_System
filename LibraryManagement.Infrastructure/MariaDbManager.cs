@@ -153,6 +153,22 @@ public sealed class MariaDbManager
                 ExpiryDate DATETIME NOT NULL,
                 Status VARCHAR(40) NOT NULL DEFAULT 'Bekliyor'
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
+
+            CREATE TABLE IF NOT EXISTS users (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                Username VARCHAR(64) NOT NULL UNIQUE,
+                Password VARCHAR(128) NOT NULL,
+                FullName VARCHAR(140) NOT NULL,
+                Role VARCHAR(32) NOT NULL DEFAULT 'User',
+                Email VARCHAR(120) NOT NULL DEFAULT '',
+                PhoneNumber VARCHAR(40) NOT NULL DEFAULT '',
+                MemberType VARCHAR(64) NOT NULL DEFAULT 'Öğrenci',
+                CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
+
+            INSERT IGNORE INTO users (Username, Password, FullName, Role, Email, MemberType) VALUES 
+            ('admin', '1234', 'Sistem Yöneticisi', 'Admin', 'admin@kutuphane.edu.tr', 'Personel'),
+            ('kullanici', '1234', 'Örnek Öğrenci', 'User', 'ogrenci@kutuphane.edu.tr', 'Öğrenci');
         """;
 
         conn.Execute(ddl);
@@ -666,6 +682,71 @@ public sealed class MariaDbManager
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"AddActivityLog error: {ex.Message}");
+        }
+    }
+
+    public List<UserAccount>? LoadUsers()
+    {
+        using var conn = GetOpenConnection();
+        if (conn == null) return null;
+
+        try
+        {
+            var rows = conn.Query<dynamic>(@"
+                SELECT Id, Username, Password, FullName, Role, Email, PhoneNumber, MemberType, CreatedAt
+                FROM users
+                ORDER BY Id ASC;
+            ");
+
+            var list = new List<UserAccount>();
+            foreach (var r in rows)
+            {
+                list.Add(new UserAccount
+                {
+                    Id = (int)r.Id,
+                    Username = (string)(r.Username ?? ""),
+                    Password = (string)(r.Password ?? ""),
+                    FullName = (string)(r.FullName ?? ""),
+                    Role = (string)(r.Role ?? "User"),
+                    Email = (string)(r.Email ?? ""),
+                    PhoneNumber = (string)(r.PhoneNumber ?? ""),
+                    MemberType = (string)(r.MemberType ?? "Öğrenci"),
+                    CreatedAt = r.CreatedAt != null ? (DateTime)r.CreatedAt : DateTime.Now
+                });
+            }
+            return list;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"LoadUsers error: {ex.Message}");
+            return null;
+        }
+    }
+
+    public bool SaveUser(UserAccount u)
+    {
+        using var conn = GetOpenConnection();
+        if (conn == null) return false;
+
+        try
+        {
+            conn.Execute(@"
+                INSERT INTO users (Username, Password, FullName, Role, Email, PhoneNumber, MemberType, CreatedAt)
+                VALUES (@Username, @Password, @FullName, @Role, @Email, @PhoneNumber, @MemberType, @CreatedAt)
+                ON DUPLICATE KEY UPDATE 
+                    Password = VALUES(Password),
+                    FullName = VALUES(FullName),
+                    Role = VALUES(Role),
+                    Email = VALUES(Email),
+                    PhoneNumber = VALUES(PhoneNumber),
+                    MemberType = VALUES(MemberType);
+            ", u);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"SaveUser error: {ex.Message}");
+            return false;
         }
     }
 }

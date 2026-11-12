@@ -104,13 +104,14 @@
         </Border>
 
         <!-- Form side -->
-        <Grid x:Name="FormPanel" Grid.Column="1" Margin="48,0,48,0">
-          <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="Giriş Yap" FontSize="30" FontWeight="SemiBold" Foreground="#F4EFE6"/>
-            <TextBlock Text="Yetkili personel veya kullanıcı hesabınızla devam edin." FontSize="13" Foreground="#C9BFAE" Margin="0,4,0,18"/>
+        <Grid x:Name="FormPanel" Grid.Column="1" Margin="44,0,44,0">
+          <!-- GİRİŞ FORMU -->
+          <StackPanel x:Name="LoginFormContainer" VerticalAlignment="Center">
+            <TextBlock Text="Giriş Yap" FontSize="28" FontWeight="SemiBold" Foreground="#F4EFE6"/>
+            <TextBlock Text="Yetkili personel veya kullanıcı hesabınızla devam edin." FontSize="13" Foreground="#C9BFAE" Margin="0,4,0,14"/>
 
             <!-- Giriş Tipi / Rol Seçimi Tab Butonları -->
-            <Border Background="#26FFFFFF" CornerRadius="12" Padding="4" Margin="0,0,0,16">
+            <Border Background="#26FFFFFF" CornerRadius="12" Padding="4" Margin="0,0,0,14">
               <Grid>
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="*"/>
@@ -124,13 +125,13 @@
               </Grid>
             </Border>
 
-            <TextBlock Text="Kullanıcı adı" FontSize="12" Foreground="#C9BFAE" Margin="2,0,0,6"/>
+            <TextBlock Text="Kullanıcı adı" FontSize="12" Foreground="#C9BFAE" Margin="2,0,0,5"/>
             <Grid>
               <TextBox x:Name="UserBox" Style="{StaticResource GlassTextBox}" Text="admin"/>
               <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" Foreground="#C9BFAE" FontSize="15" Margin="15,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
             </Grid>
 
-            <TextBlock Text="Şifre" FontSize="12" Foreground="#C9BFAE" Margin="2,16,0,6"/>
+            <TextBlock Text="Şifre" FontSize="12" Foreground="#C9BFAE" Margin="2,12,0,5"/>
             <Grid>
               <PasswordBox x:Name="PassBox" Style="{StaticResource GlassPassword}" PasswordChanged="OnPasswordChanged"/>
               <TextBox x:Name="PassTextBox" Style="{StaticResource GlassTextBox}" Visibility="Collapsed" TextChanged="OnPassTextChanged"/>
@@ -141,14 +142,14 @@
               </Button>
             </Grid>
 
-            <Grid Margin="0,14,0,0">
+            <Grid Margin="0,10,0,0">
               <CheckBox Content="Beni hatırla" Foreground="#E3DACB" FontSize="12" IsChecked="True" VerticalContentAlignment="Center"/>
               <TextBlock Text="Şifremi unuttum" Foreground="#E4B368" FontSize="12" HorizontalAlignment="Right" Cursor="Hand" MouseLeftButtonUp="OnForgotPassword"/>
             </Grid>
 
-            <TextBlock x:Name="ErrorText" Foreground="#F08A7A" FontSize="12" Margin="2,10,0,0" MinHeight="18"/>
+            <TextBlock x:Name="ErrorText" Foreground="#F08A7A" FontSize="12" Margin="2,8,0,0" MinHeight="18"/>
 
-            <Button Content="Giriş Yap" Height="48" Margin="0,6,0,0" FontSize="15" FontWeight="SemiBold" Click="OnLogin"
+            <Button Content="Giriş Yap" Height="46" Margin="0,4,0,0" FontSize="15" FontWeight="SemiBold" Click="OnLogin"
                     Style="{StaticResource GlassButton}" BorderBrush="#8FD6A0">
               <Button.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -157,8 +158,107 @@
                 </LinearGradientBrush>
               </Button.Background>
             </Button>
+
+            <!-- Kayıt Ol Linki -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,14,0,0">
+              <TextBlock Text="Hesabınız yok mu?" Foreground="#C9BFAE" FontSize="12"/>
+              <TextBlock Text=" Hemen Kayıt Olun" Foreground="#6FBF7F" FontSize="12" FontWeight="SemiBold" Cursor="Hand" MouseLeftButtonUp="OnSwitchToRegister"/>
+            </StackPanel>
           </StackPanel>
-          <TextBlock Text="© Fırat Üniversitesi Kütüphane Daire Başkanlığı" FontSize="10" Foreground="#9C9384" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,18"/>
+
+          <!-- YENİ KULLANICI KAYIT FORMU -->
+          <StackPanel x:Name="RegisterFormContainer" VerticalAlignment="Center" Visibility="Collapsed">
+            <TextBlock Text="Yeni Hesap Oluştur" FontSize="26" FontWeight="SemiBold" Foreground="#F4EFE6"/>
+            <TextBlock Text="Kütüphane üyesi olarak hızlıca kaydolun." FontSize="12" Foreground="#C9BFAE" Margin="0,2,0,10"/>
+
+            <!-- Ad Soyad & Kullanıcı Adı -->
+            <Grid Margin="0,0,0,6">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel Grid.Column="0">
+                <TextBlock Text="Ad Soyad" FontSize="11" Foreground="#C9BFAE" Margin="2,0,0,4"/>
+                <TextBox x:Name="RegFullNameBox" Style="{StaticResource GlassTextBox}" Height="40" Padding="14,0,14,0"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2">
+                <TextBlock Text="Kullanıcı Adı" FontSize="11" Foreground="#C9BFAE" Margin="2,0,0,4"/>
+                <TextBox x:Name="RegUserBox" Style="{StaticResource GlassTextBox}" Height="40" Padding="14,0,14,0"/>
+              </StackPanel>
+            </Grid>
+
+            <!-- E-posta & Telefon -->
+            <Grid Margin="0,0,0,6">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel Grid.Column="0">
+                <TextBlock Text="E-posta" FontSize="11" Foreground="#C9BFAE" Margin="2,0,0,4"/>
+                <TextBox x:Name="RegEmailBox" Style="{StaticResource GlassTextBox}" Height="40" Padding="14,0,14,0"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2">
+                <TextBlock Text="Telefon" FontSize="11" Foreground="#C9BFAE" Margin="2,0,0,4"/>
+                <TextBox x:Name="RegPhoneBox" Style="{StaticResource GlassTextBox}" Height="40" Padding="14,0,14,0"/>
+              </StackPanel>
+            </Grid>
+
+            <!-- Üye Türü Seçimi -->
+            <TextBlock Text="Üye Türü" FontSize="11" Foreground="#C9BFAE" Margin="2,0,0,4"/>
+            <Border Background="#26FFFFFF" CornerRadius="10" Padding="3" Margin="0,0,0,6">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="RegTypeOgrenciBtn" Grid.Column="0" Content="🎓 Öğrenci" Height="30" FontSize="11" FontWeight="SemiBold"
+                        Click="OnSelectRegTypeOgrenci" Style="{StaticResource GlassButton}"/>
+                <Button x:Name="RegTypeAkademikBtn" Grid.Column="1" Content="🏛️ Akademik" Height="30" FontSize="11" FontWeight="SemiBold"
+                        Click="OnSelectRegTypeAkademik" Style="{StaticResource GlassButton}" Background="Transparent" BorderBrush="Transparent"/>
+                <Button x:Name="RegTypePersonelBtn" Grid.Column="2" Content="💼 Personel" Height="30" FontSize="11" FontWeight="SemiBold"
+                        Click="OnSelectRegTypePersonel" Style="{StaticResource GlassButton}" Background="Transparent" BorderBrush="Transparent"/>
+              </Grid>
+            </Border>
+
+            <!-- Şifre & Şifre Tekrar -->
+            <Grid Margin="0,0,0,4">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel Grid.Column="0">
+                <TextBlock Text="Şifre" FontSize="11" Foreground="#C9BFAE" Margin="2,0,0,4"/>
+                <PasswordBox x:Name="RegPassBox" Style="{StaticResource GlassPassword}" Height="40" Padding="14,0,14,0"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2">
+                <TextBlock Text="Şifre Tekrar" FontSize="11" Foreground="#C9BFAE" Margin="2,0,0,4"/>
+                <PasswordBox x:Name="RegPassConfirmBox" Style="{StaticResource GlassPassword}" Height="40" Padding="14,0,14,0"/>
+              </StackPanel>
+            </Grid>
+
+            <TextBlock x:Name="RegErrorText" Foreground="#F08A7A" FontSize="11" Margin="2,4,0,0" MinHeight="16"/>
+
+            <Button Content="Kaydı Tamamla ve Giriş Yap" Height="44" Margin="0,4,0,0" FontSize="14" FontWeight="SemiBold" Click="OnRegisterSubmit"
+                    Style="{StaticResource GlassButton}" BorderBrush="#8FD6A0">
+              <Button.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                  <GradientStop Color="#5FAE72" Offset="0"/>
+                  <GradientStop Color="#2F6B46" Offset="1"/>
+                </LinearGradientBrush>
+              </Button.Background>
+            </Button>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+              <TextBlock Text="Zaten hesabınız var mı?" Foreground="#C9BFAE" FontSize="12"/>
+              <TextBlock Text=" Giriş Yapın" Foreground="#6FBF7F" FontSize="12" FontWeight="SemiBold" Cursor="Hand" MouseLeftButtonUp="OnSwitchToLogin"/>
+            </StackPanel>
+          </StackPanel>
+
+          <TextBlock Text="© Fırat Üniversitesi Kütüphane Daire Başkanlığı" FontSize="10" Foreground="#9C9384" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,12"/>
         </Grid>
 
         <!-- Welcome transition screen (from login-preview.html #ok) -->

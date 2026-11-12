@@ -12,6 +12,7 @@ public partial class LoginWindow : Window
     bool _syncingPassword;
     bool _submitting;
     UserRole _selectedRole = UserRole.Admin;
+    string _regMemberType = "Öğrenci";
 
     public UserRole SelectedRole => _selectedRole;
 
@@ -20,9 +21,16 @@ public partial class LoginWindow : Window
         InitializeComponent();
         PassBox.Password = "1234";
         UpdateRoleButtons();
+        UpdateRegTypeButtons();
         KeyDown += (_, e) =>
         {
-            if (e.Key == Key.Enter) Submit();
+            if (e.Key == Key.Enter)
+            {
+                if (RegisterFormContainer.Visibility == Visibility.Visible)
+                    SubmitRegister();
+                else
+                    Submit();
+            }
             else if (e.Key == Key.Escape) DialogResult = false;
         };
         Loaded += async (_, _) =>
@@ -42,6 +50,139 @@ public partial class LoginWindow : Window
                 }
             }
         };
+    }
+
+    void OnSwitchToRegister(object s, MouseButtonEventArgs e)
+    {
+        LoginFormContainer.Visibility = Visibility.Collapsed;
+        RegisterFormContainer.Visibility = Visibility.Visible;
+        RegErrorText.Text = "";
+        RegFullNameBox.Focus();
+    }
+
+    void OnSwitchToLogin(object s, MouseButtonEventArgs e)
+    {
+        RegisterFormContainer.Visibility = Visibility.Collapsed;
+        LoginFormContainer.Visibility = Visibility.Visible;
+        ErrorText.Text = "";
+        UserBox.Focus();
+    }
+
+    void OnSelectRegTypeOgrenci(object sender, RoutedEventArgs e)
+    {
+        _regMemberType = "Öğrenci";
+        UpdateRegTypeButtons();
+    }
+
+    void OnSelectRegTypeAkademik(object sender, RoutedEventArgs e)
+    {
+        _regMemberType = "Akademik Personel";
+        UpdateRegTypeButtons();
+    }
+
+    void OnSelectRegTypePersonel(object sender, RoutedEventArgs e)
+    {
+        _regMemberType = "İdari Personel";
+        UpdateRegTypeButtons();
+    }
+
+    void UpdateRegTypeButtons()
+    {
+        var activeBrush = new LinearGradientBrush(Ui.C("#5FAE72"), Ui.C("#2F6B46"), 90);
+        var activeBorder = Ui.B("#8FD6A0");
+
+        RegTypeOgrenciBtn.Background = _regMemberType == "Öğrenci" ? activeBrush : Brushes.Transparent;
+        RegTypeOgrenciBtn.BorderBrush = _regMemberType == "Öğrenci" ? activeBorder : Brushes.Transparent;
+        RegTypeOgrenciBtn.Foreground = _regMemberType == "Öğrenci" ? Brushes.White : Ui.B("#C9BFAE");
+
+        RegTypeAkademikBtn.Background = _regMemberType == "Akademik Personel" ? activeBrush : Brushes.Transparent;
+        RegTypeAkademikBtn.BorderBrush = _regMemberType == "Akademik Personel" ? activeBorder : Brushes.Transparent;
+        RegTypeAkademikBtn.Foreground = _regMemberType == "Akademik Personel" ? Brushes.White : Ui.B("#C9BFAE");
+
+        RegTypePersonelBtn.Background = _regMemberType == "İdari Personel" ? activeBrush : Brushes.Transparent;
+        RegTypePersonelBtn.BorderBrush = _regMemberType == "İdari Personel" ? activeBorder : Brushes.Transparent;
+        RegTypePersonelBtn.Foreground = _regMemberType == "İdari Personel" ? Brushes.White : Ui.B("#C9BFAE");
+    }
+
+    void OnRegisterSubmit(object sender, RoutedEventArgs e) => SubmitRegister();
+
+    async void SubmitRegister()
+    {
+        if (_submitting) return;
+        RegErrorText.Foreground = Ui.B("#F08A7A");
+        RegErrorText.Text = "";
+
+        string fullName = RegFullNameBox.Text.Trim();
+        string username = RegUserBox.Text.Trim();
+        string email = RegEmailBox.Text.Trim();
+        string phone = RegPhoneBox.Text.Trim();
+        string pass = RegPassBox.Password;
+        string confirmPass = RegPassConfirmBox.Password;
+
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            RegFail("Lütfen ad ve soyadınızı giriniz.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(username) || username.Length < 3)
+        {
+            RegFail("Kullanıcı adı en az 3 karakter olmalıdır.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(pass) || pass.Length < 4)
+        {
+            RegFail("Şifre en az 4 karakter olmalıdır.");
+            return;
+        }
+
+        if (pass != confirmPass)
+        {
+            RegFail("Girdiğiniz şifreler birbiriyle eşleşmiyor.");
+            return;
+        }
+
+        var newAccount = new Domain.Entities.UserAccount
+        {
+            FullName = fullName,
+            Username = username,
+            Password = pass,
+            Email = email,
+            PhoneNumber = phone,
+            MemberType = _regMemberType,
+            Role = "User"
+        };
+
+        if (!CheckoutState.Instance.DataService.RegisterUser(newAccount, out string err))
+        {
+            RegFail(err);
+            return;
+        }
+
+        // Başarılı kayıt: otomatik oturum açarak Kiosk'a yönlendir
+        _submitting = true;
+        _selectedRole = UserRole.User;
+        CheckoutState.Instance.LoggedInUser = fullName;
+        CheckoutState.Instance.LoggedInRole = UserRole.User;
+
+        FormPanel.Visibility = Visibility.Collapsed;
+        WelcomeTitle.Text = $"Hoş geldiniz, {fullName}";
+        ((TextBlock)WelcomePanel.Children[2]).Text = "Hesabınız oluşturuldu. Kütüphane paneli açılıyor…";
+        WelcomePanel.Visibility = Visibility.Visible;
+
+        await Task.Delay(1100);
+        DialogResult = true;
+    }
+
+    void RegFail(string message)
+    {
+        RegErrorText.Text = message;
+        var a = new DoubleAnimationUsingKeyFrames { Duration = TimeSpan.FromMilliseconds(380) };
+        double[] xs = { -12, 10, -8, 6, -3, 0 };
+        for (int i = 0; i < xs.Length; i++)
+            a.KeyFrames.Add(new LinearDoubleKeyFrame(xs[i], KeyTime.FromPercent((i + 1) / (double)xs.Length)));
+        Shake.BeginAnimation(TranslateTransform.XProperty, a);
     }
 
     void OnSelectAdminRole(object sender, RoutedEventArgs e)
@@ -159,31 +300,43 @@ public partial class LoginWindow : Window
             Fail("Kullanıcı adı ve şifre gerekli.");
             return;
         }
-        if (!TryLogin(user, pass))
+
+        Domain.Entities.UserAccount? loggedInAccount = CheckoutState.Instance.DataService.AuthenticateUser(user, pass);
+        if (loggedInAccount == null)
+        {
+            if (string.Equals(user, "admin", StringComparison.OrdinalIgnoreCase) && pass == "1234")
+            {
+                loggedInAccount = new Domain.Entities.UserAccount { Username = "admin", FullName = "Sistem Yöneticisi", Role = "Admin" };
+            }
+            else if (string.Equals(user, "kullanici", StringComparison.OrdinalIgnoreCase) && pass == "1234")
+            {
+                loggedInAccount = new Domain.Entities.UserAccount { Username = "kullanici", FullName = "Örnek Öğrenci", Role = "User" };
+            }
+        }
+
+        if (loggedInAccount == null)
         {
             Fail("Kullanıcı adı veya şifre hatalı.");
             return;
         }
 
-        // Kullanıcı adına göre rol belirleme (admin / yonetici ise Admin, kullanici / user veya tab seçimine göre)
-        if (string.Equals(user, "admin", StringComparison.OrdinalIgnoreCase) ||
+        if (string.Equals(loggedInAccount.Role, "Admin", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(user, "admin", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(user, "yonetici", StringComparison.OrdinalIgnoreCase))
         {
             _selectedRole = UserRole.Admin;
         }
-        else if (string.Equals(user, "kullanici", StringComparison.OrdinalIgnoreCase) ||
-                 string.Equals(user, "user", StringComparison.OrdinalIgnoreCase) ||
-                 string.Equals(user, "ogrenci", StringComparison.OrdinalIgnoreCase))
+        else
         {
             _selectedRole = UserRole.User;
         }
 
         _submitting = true;
-        CheckoutState.Instance.LoggedInUser = user;
+        CheckoutState.Instance.LoggedInUser = loggedInAccount.FullName;
         CheckoutState.Instance.LoggedInRole = _selectedRole;
 
         string roleTitle = _selectedRole == UserRole.Admin ? "Yönetim Paneli açılıyor…" : "Kullanıcı Paneli açılıyor…";
-        WelcomeTitle.Text = $"Hoş geldiniz, {user}";
+        WelcomeTitle.Text = $"Hoş geldiniz, {loggedInAccount.FullName}";
         ((TextBlock)WelcomePanel.Children[2]).Text = roleTitle;
         FormPanel.Visibility = Visibility.Collapsed;
         WelcomePanel.Visibility = Visibility.Visible;
