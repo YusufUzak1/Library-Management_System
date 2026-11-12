@@ -1,0 +1,181 @@
+<Window x:Class="LibraryManagement.Desktop.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:LibraryManagement.Desktop"
+        Title="Giriş – Fırat Üniversitesi Kütüphane Sistemi" Width="1000" Height="640" WindowStartupLocation="CenterScreen"
+        WindowStyle="None" ResizeMode="NoResize" Background="#1A0F08"
+        FontFamily="Segoe UI, Segoe UI Variable Text"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType"
+        RenderOptions.ClearTypeHint="Enabled"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+  <Window.Resources>
+    <ControlTemplate x:Key="InputTpl" TargetType="Control">
+      <Border x:Name="bd" Background="#26FFFFFF" BorderBrush="#40FFFFFF" BorderThickness="1" CornerRadius="12" Height="46" Padding="42,0,42,0">
+        <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+      </Border>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsKeyboardFocused" Value="True">
+          <Setter TargetName="bd" Property="BorderBrush" Value="#6FBF7F"/>
+          <Setter TargetName="bd" Property="Background" Value="#33FFFFFF"/>
+        </Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <Style x:Key="GlassTextBox" TargetType="TextBox">
+      <Setter Property="Foreground" Value="#F4EFE6"/>
+      <Setter Property="CaretBrush" Value="#F4EFE6"/>
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="Template" Value="{StaticResource InputTpl}"/>
+    </Style>
+    <Style x:Key="GlassPassword" TargetType="PasswordBox">
+      <Setter Property="Foreground" Value="#F4EFE6"/>
+      <Setter Property="CaretBrush" Value="#F4EFE6"/>
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="Template" Value="{StaticResource InputTpl}"/>
+    </Style>
+  </Window.Resources>
+
+  <Grid>
+    <local:ShelfBackground Seed="7">
+      <local:ShelfBackground.Effect>
+        <BlurEffect Radius="13"/>
+      </local:ShelfBackground.Effect>
+    </local:ShelfBackground>
+    <Rectangle Fill="#55140C06"/>
+
+    <!-- Warm radial lighting accents matching login-preview.html -->
+    <Ellipse Width="500" Height="400" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-80,-60,0,0" IsHitTestVisible="False">
+      <Ellipse.Fill>
+        <RadialGradientBrush>
+          <GradientStop Color="#55FFC878" Offset="0"/>
+          <GradientStop Color="#00FFC878" Offset="1"/>
+        </RadialGradientBrush>
+      </Ellipse.Fill>
+    </Ellipse>
+    <Ellipse Width="500" Height="400" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,40,-80,0" IsHitTestVisible="False">
+      <Ellipse.Fill>
+        <RadialGradientBrush>
+          <GradientStop Color="#44FFC878" Offset="0"/>
+          <GradientStop Color="#00FFC878" Offset="1"/>
+        </RadialGradientBrush>
+      </Ellipse.Fill>
+    </Ellipse>
+
+    <Border x:Name="Card" Width="900" Height="540" CornerRadius="28" Background="#73261A10" BorderBrush="#40FFFFFF" BorderThickness="1" ClipToBounds="True">
+      <Border.RenderTransform>
+        <TranslateTransform x:Name="Shake"/>
+      </Border.RenderTransform>
+      <Border.Effect>
+        <DropShadowEffect BlurRadius="50" ShadowDepth="12" Opacity="0.55"/>
+      </Border.Effect>
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1.05*"/>
+          <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Brand side -->
+        <Border Background="#47000000">
+          <Grid Margin="36,32">
+            <StackPanel VerticalAlignment="Top">
+              <StackPanel Orientation="Horizontal">
+                <Viewbox Width="32" Height="32" VerticalAlignment="Center">
+                  <Canvas Width="24" Height="24">
+                    <Path Data="M12,6 C10,4.5 7,4 4,4.5 L4,17.5 C7,17 10,17.5 12,19 C14,17.5 17,17 20,17.5 L20,4.5 C17,4 14,4.5 12,6 Z M12,6 L12,19"
+                          Stroke="#F2E2BC" StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
+                  </Canvas>
+                </Viewbox>
+                <StackPanel Margin="12,0,0,0">
+                  <TextBlock Text="Fırat Üniversitesi" FontFamily="Georgia" FontSize="17" Foreground="#F2E2BC"/>
+                  <TextBlock Text="Kütüphane Sistemi" FontFamily="Georgia" FontSize="17" Foreground="#F2E2BC"/>
+                </StackPanel>
+              </StackPanel>
+              <TextBlock Text="Bilgiye açılan kapı." FontFamily="Georgia" FontSize="30" Foreground="#FBF3E0" Margin="0,34,0,0" TextWrapping="Wrap"/>
+              <Rectangle Width="90" Height="2" Fill="#E4B368" HorizontalAlignment="Left" Margin="0,10,0,0"/>
+            </StackPanel>
+            <Ellipse Width="300" Height="44" VerticalAlignment="Bottom" Margin="0,0,0,18" Fill="Black" Opacity="0.5">
+              <Ellipse.Effect>
+                <BlurEffect Radius="14"/>
+              </Ellipse.Effect>
+            </Ellipse>
+            <local:AnimatedBookStack x:Name="Deco" Width="360" Height="340" Floor="326" MaxStack="400" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
+          </Grid>
+        </Border>
+
+        <!-- Form side -->
+        <Grid x:Name="FormPanel" Grid.Column="1" Margin="48,0,48,0">
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Giriş Yap" FontSize="30" FontWeight="SemiBold" Foreground="#F4EFE6"/>
+            <TextBlock Text="Yetkili personel veya kullanıcı hesabınızla devam edin." FontSize="13" Foreground="#C9BFAE" Margin="0,4,0,18"/>
+
+            <!-- Giriş Tipi / Rol Seçimi Tab Butonları -->
+            <Border Background="#26FFFFFF" CornerRadius="12" Padding="4" Margin="0,0,0,16">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="AdminRoleBtn" Grid.Column="0" Content="🛡️ Yönetici (Admin)" Height="34"
+                        FontSize="12" FontWeight="SemiBold" Click="OnSelectAdminRole" Style="{StaticResource GlassButton}"/>
+                <Button x:Name="UserRoleBtn" Grid.Column="1" Content="👤 Kullanıcı Paneli" Height="34"
+                        FontSize="12" FontWeight="SemiBold" Click="OnSelectUserRole" Style="{StaticResource GlassButton}"
+                        Background="Transparent" BorderBrush="Transparent"/>
+              </Grid>
+            </Border>
+
+            <TextBlock Text="Kullanıcı adı" FontSize="12" Foreground="#C9BFAE" Margin="2,0,0,6"/>
+            <Grid>
+              <TextBox x:Name="UserBox" Style="{StaticResource GlassTextBox}" Text="admin"/>
+              <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" Foreground="#C9BFAE" FontSize="15" Margin="15,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+            </Grid>
+
+            <TextBlock Text="Şifre" FontSize="12" Foreground="#C9BFAE" Margin="2,16,0,6"/>
+            <Grid>
+              <PasswordBox x:Name="PassBox" Style="{StaticResource GlassPassword}" PasswordChanged="OnPasswordChanged"/>
+              <TextBox x:Name="PassTextBox" Style="{StaticResource GlassTextBox}" Visibility="Collapsed" TextChanged="OnPassTextChanged"/>
+              <TextBlock Text="&#xE72E;" FontFamily="Segoe MDL2 Assets" Foreground="#C9BFAE" FontSize="15" Margin="15,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+              <Button x:Name="EyeBtn" Width="34" Height="34" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,6,0"
+                      Background="Transparent" BorderThickness="0" Cursor="Hand" Click="OnTogglePassword" ToolTip="Şifreyi Göster/Gizle">
+                <TextBlock x:Name="EyeIcon" Text="&#xE7B3;" FontFamily="Segoe MDL2 Assets" FontSize="15" Foreground="#C9BFAE"/>
+              </Button>
+            </Grid>
+
+            <Grid Margin="0,14,0,0">
+              <CheckBox Content="Beni hatırla" Foreground="#E3DACB" FontSize="12" IsChecked="True" VerticalContentAlignment="Center"/>
+              <TextBlock Text="Şifremi unuttum" Foreground="#E4B368" FontSize="12" HorizontalAlignment="Right" Cursor="Hand" MouseLeftButtonUp="OnForgotPassword"/>
+            </Grid>
+
+            <TextBlock x:Name="ErrorText" Foreground="#F08A7A" FontSize="12" Margin="2,10,0,0" MinHeight="18"/>
+
+            <Button Content="Giriş Yap" Height="48" Margin="0,6,0,0" FontSize="15" FontWeight="SemiBold" Click="OnLogin"
+                    Style="{StaticResource GlassButton}" BorderBrush="#8FD6A0">
+              <Button.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                  <GradientStop Color="#5FAE72" Offset="0"/>
+                  <GradientStop Color="#2F6B46" Offset="1"/>
+                </LinearGradientBrush>
+              </Button.Background>
+            </Button>
+          </StackPanel>
+          <TextBlock Text="© Fırat Üniversitesi Kütüphane Daire Başkanlığı" FontSize="10" Foreground="#9C9384" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,18"/>
+        </Grid>
+
+        <!-- Welcome transition screen (from login-preview.html #ok) -->
+        <StackPanel x:Name="WelcomePanel" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed" Margin="20">
+          <Border Width="64" Height="64" CornerRadius="32" Background="#336FBF7F" BorderBrush="#8FD6A0" BorderThickness="1.5" HorizontalAlignment="Center" Margin="0,0,0,18">
+            <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="28" Foreground="#6FBF7F" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <TextBlock x:Name="WelcomeTitle" Text="Hoş geldiniz, Yusuf" FontFamily="Georgia" FontSize="30" Foreground="#FBF3E0" TextAlignment="Center" Margin="0,0,0,8"/>
+          <TextBlock Text="Yönetim paneli açılıyor…" FontSize="14" Foreground="#C9BFAE" TextAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Window drag & close -->
+        <Border Grid.ColumnSpan="2" Height="40" VerticalAlignment="Top" Background="Transparent" MouseLeftButtonDown="OnDrag"/>
+        <Button Grid.Column="1" Content="&#xE711;" FontFamily="Segoe MDL2 Assets" Width="34" Height="34" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,12,0"
+                Style="{StaticResource GlassButton}" Background="Transparent" BorderBrush="Transparent" Click="OnClose"/>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>
+

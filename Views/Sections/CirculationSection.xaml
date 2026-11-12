@@ -1,0 +1,446 @@
+<UserControl x:Class="Scriptorium.Views.Sections.CirculationSection"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="14" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- ==================== 1. CIRCULATION WORKBENCH MODE HEADER ==================== -->
+        <Border Grid.Row="0" Style="{StaticResource Panel.Section}" Padding="16,10">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="1. Üye &amp; Ödünç Verme Masası"
+                            Style="{StaticResource Button.Primary}"
+                            Command="{Binding SetCirculationModeCommand}"
+                            CommandParameter="IssueDesk"
+                            Margin="0,0,8,0" />
+                    <Button Content="2. Hızlı İade &amp; Süre Uzatma Listesi"
+                            Style="{StaticResource Button.Secondary}"
+                            Command="{Binding SetCirculationModeCommand}"
+                            CommandParameter="RapidReturn" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Border Background="{StaticResource Brush.Surface.Subtle}" BorderBrush="{StaticResource Brush.Border.Default}" BorderThickness="1" CornerRadius="3" Padding="10,4" Margin="0,0,10,0">
+                        <TextBlock FontSize="11.5" Foreground="{StaticResource Brush.Text.Secondary}">
+                            <Run Text="Aktif Ödünç: " />
+                            <Run Text="{Binding BorrowedCopiesCount, Mode=OneWay}" FontWeight="Bold" Foreground="{StaticResource Brush.Text.Primary}" />
+                            <Run Text=" Nüsha  •  Bugün Teslim: " />
+                            <Run Text="{Binding DueTodayCount, Mode=OneWay}" FontWeight="Bold" Foreground="{StaticResource Brush.Status.WarningText}" />
+                            <Run Text="  •  Gecikmiş: " />
+                            <Run Text="{Binding OverdueBooksCount, Mode=OneWay}" FontWeight="Bold" Foreground="{StaticResource Brush.Status.DangerText}" />
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ==================== MODE A: DUAL-PANE ISSUE & MEMBER CIRCULATION DESK ==================== -->
+        <Grid Grid.Row="2"
+              Visibility="{Binding CirculationMode, Converter={StaticResource ScreenVisConverter}, ConverterParameter=IssueDesk}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.05*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT PANE: MEMBER SELECTION, QUOTA & CURRENTLY BORROWED BOOKS -->
+            <Border Grid.Column="0" Style="{StaticResource Panel.Section}">
+                <Grid Margin="16,14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Step 1: Member Search & Selector -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                        <DockPanel Margin="0,0,0,6">
+                            <TextBlock Text="1. ADIM — OKUR / ÜYE SEÇİMİ" FontSize="11.5" FontWeight="Bold" Foreground="{StaticResource Brush.Accent.Primary}" />
+                            <TextBlock Text="Üye No, Ad Soyad veya Telefon ile arayın" FontSize="11" Foreground="{StaticResource Brush.Text.Muted}" HorizontalAlignment="Right" />
+                        </DockPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="1.2*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding CirculationMemberSearch, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource Input.TextBox}"
+                                     ToolTip="Üye adı veya UYE-2026-XXXX numarası yazın" />
+                            <ComboBox Grid.Column="2"
+                                      ItemsSource="{Binding CirculationMemberSuggestions}"
+                                      SelectedItem="{Binding SelectedCirculationMember, Mode=TwoWay}"
+                                      DisplayMemberPath="FullName"
+                                      Style="{StaticResource Input.ComboBox}" />
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Selected Member Dossier Card -->
+                    <Border Grid.Row="1" Style="{StaticResource Panel.SubtleWell}" Padding="14,12" Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <DockPanel Grid.Row="0">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding SelectedCirculationMember.FullName, FallbackValue='Üye Seçilmedi'}"
+                                               FontFamily="{StaticResource Font.Family.Serif}"
+                                               FontSize="16"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock FontSize="12" Foreground="{StaticResource Brush.Text.Secondary}" Margin="0,2,0,0">
+                                        <Run Text="{Binding SelectedCirculationMember.MemberNumber, Mode=OneWay}" FontFamily="{StaticResource Font.Family.Mono}" FontWeight="SemiBold" />
+                                        <Run Text=" • " />
+                                        <Run Text="{Binding SelectedCirculationMember.MemberType, Mode=OneWay}" />
+                                        <Run Text=" • " />
+                                        <Run Text="{Binding SelectedCirculationMember.Phone, Mode=OneWay}" />
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <Border Background="{Binding SelectedCirculationMember.StatusKind, Converter={StaticResource StatusBgConverter}}"
+                                        BorderBrush="{Binding SelectedCirculationMember.StatusKind, Converter={StaticResource StatusBorderConverter}}"
+                                        BorderThickness="1" CornerRadius="3" Padding="8,3"
+                                        HorizontalAlignment="Right" VerticalAlignment="Top">
+                                    <TextBlock Text="{Binding SelectedCirculationMember.Status}"
+                                               Foreground="{Binding SelectedCirculationMember.StatusKind, Converter={StaticResource StatusFgConverter}}"
+                                               FontSize="11" FontWeight="SemiBold" />
+                                </Border>
+                            </DockPanel>
+
+                            <UniformGrid Grid.Row="2" Columns="3">
+                                <StackPanel>
+                                    <TextBlock Text="ÖDÜNÇ KOTASI" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource Brush.Text.Secondary}" />
+                                    <TextBlock Text="{Binding SelectedCirculationMember.QuotaRatioText}" FontFamily="{StaticResource Font.Family.Mono}" FontSize="15" FontWeight="Bold" />
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="GECİKMİŞ KİTAP" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource Brush.Text.Secondary}" />
+                                    <TextBlock Text="{Binding SelectedCirculationMember.OverdueCount, StringFormat='{}{0} Adet'}" FontFamily="{StaticResource Font.Family.Mono}" FontSize="15" FontWeight="Bold" Foreground="{StaticResource Brush.Status.DangerText}" />
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="GECİKME BAKİYESİ" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource Brush.Text.Secondary}" />
+                                    <TextBlock Text="{Binding SelectedCirculationMember.FineBalanceText}" FontFamily="{StaticResource Font.Family.Mono}" FontSize="15" FontWeight="Bold" />
+                                </StackPanel>
+                            </UniformGrid>
+
+                            <Border Grid.Row="4" Background="#FFFFFF" BorderBrush="{StaticResource Brush.Border.Default}" BorderThickness="1" CornerRadius="3" Padding="10,6">
+                                <TextBlock Text="{Binding SelectedCirculationMember.EligibilityMessage}" FontSize="12" FontWeight="Medium" Foreground="{StaticResource Brush.Text.Primary}" />
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Member's Currently Borrowed Books Header -->
+                    <DockPanel Grid.Row="2" Margin="0,0,0,6">
+                        <TextBlock Text="ÜYENİN ÜZERİNDEKİ MEVCUT KİTAPLAR (HIZLI İADE &amp; UZATMA)" FontSize="11.5" FontWeight="Bold" Foreground="{StaticResource Brush.Text.Secondary}" />
+                        <TextBlock Text="{Binding CirculationMemberActiveLoans.Count, StringFormat='{}{0} aktif ödünç'}" FontSize="11.5" Foreground="{StaticResource Brush.Text.Muted}" HorizontalAlignment="Right" />
+                    </DockPanel>
+
+                    <!-- Active Loans Table for Selected Member -->
+                    <DataGrid Grid.Row="3"
+                              ItemsSource="{Binding CirculationMemberActiveLoans}"
+                              Style="{StaticResource Grid.Archival}"
+                              RowHeight="44">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="KİTAP ADI VE BARKOD" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding BookTitle}" FontWeight="SemiBold" FontSize="12.5" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding BookBarcode}" FontFamily="{StaticResource Font.Family.Mono}" FontSize="10.5" Foreground="{StaticResource Brush.Text.Muted}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="SON TESLİM" Binding="{Binding DueDateText, Mode=OneWay}" Width="88" FontFamily="{StaticResource Font.Family.Mono}" FontSize="11.5" />
+                            <DataGridTemplateColumn Header="DURUM" Width="115">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{Binding StatusKind, Converter={StaticResource StatusBgConverter}}"
+                                                BorderBrush="{Binding StatusKind, Converter={StaticResource StatusBorderConverter}}"
+                                                BorderThickness="1" CornerRadius="3" Padding="6,2" HorizontalAlignment="Left">
+                                            <TextBlock Text="{Binding DueStatusLabel}"
+                                                       Foreground="{Binding StatusKind, Converter={StaticResource StatusFgConverter}}"
+                                                       FontSize="10.5" FontWeight="SemiBold" />
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="BANKO İŞLEMİ" Width="138">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="✓ İade Al"
+                                                    Style="{StaticResource Button.CompactPrimary}"
+                                                    Command="{Binding DataContext.ProcessReturnCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Margin="0,0,6,0" />
+                                            <Button Content="+15g"
+                                                    ToolTip="Teslim süresini 15 gün uzat"
+                                                    Style="{StaticResource Button.Compact}"
+                                                    Command="{Binding DataContext.ProcessRenewalCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <!-- RIGHT PANE: BOOK SELECTION & ISSUE TRANSACTION EXECUTION -->
+            <Border Grid.Column="2" Style="{StaticResource Panel.Section}">
+                <Grid Margin="16,14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Step 2: Book Barcode / ISBN / Title Lookup -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                        <DockPanel Margin="0,0,0,6">
+                            <TextBlock Text="2. ADIM — ÖDÜNÇ VERİLECEK KİTAP SEÇİMİ" FontSize="11.5" FontWeight="Bold" Foreground="{StaticResource Brush.Accent.Primary}" />
+                            <TextBlock Text="Barkod, ISBN-13 veya Eser Adı" FontSize="11" Foreground="{StaticResource Brush.Text.Muted}" HorizontalAlignment="Right" />
+                        </DockPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="1.25*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding CirculationBookSearch, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource Input.TextBox}"
+                                     ToolTip="Kitap barkodu, ISBN veya başlık ara" />
+                            <ComboBox Grid.Column="2"
+                                      ItemsSource="{Binding CirculationBookSuggestions}"
+                                      SelectedItem="{Binding SelectedCirculationBook, Mode=TwoWay}"
+                                      DisplayMemberPath="Title"
+                                      Style="{StaticResource Input.ComboBox}" />
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Selected Book Verification Card -->
+                    <Border Grid.Row="1" Style="{StaticResource Panel.SubtleWell}" Padding="14,12" Margin="0,0,0,14">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="52" />
+                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Width="52" Height="72" CornerRadius="3"
+                                    Background="{Binding SelectedCirculationBook.CoverHex, Converter={StaticResource HexToBrushConverter}}"
+                                    BorderBrush="#33000000" BorderThickness="1">
+                                <TextBlock Text="{Binding SelectedCirculationBook.CoverInitials}"
+                                           FontFamily="{StaticResource Font.Family.Serif}"
+                                           FontSize="16" FontWeight="Bold" Foreground="#F6F4EF"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding SelectedCirculationBook.Title, FallbackValue='Kitap Seçilmedi'}"
+                                           FontFamily="{StaticResource Font.Family.Serif}"
+                                           FontSize="15.5" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding SelectedCirculationBook.AuthorName}"
+                                           FontSize="12.5" FontWeight="Medium" Foreground="{StaticResource Brush.Text.Secondary}" Margin="0,2,0,4" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Background="{Binding SelectedCirculationBook.StatusKind, Converter={StaticResource StatusBgConverter}}"
+                                            BorderBrush="{Binding SelectedCirculationBook.StatusKind, Converter={StaticResource StatusBorderConverter}}"
+                                            BorderThickness="1" CornerRadius="3" Padding="7,2" Margin="0,0,8,0">
+                                        <TextBlock Text="{Binding SelectedCirculationBook.AvailabilityStatus}"
+                                                   Foreground="{Binding SelectedCirculationBook.StatusKind, Converter={StaticResource StatusFgConverter}}"
+                                                   FontSize="11" FontWeight="SemiBold" />
+                                    </Border>
+                                    <TextBlock Text="{Binding SelectedCirculationBook.InventoryRatioText, StringFormat='Rafta Mevcut: {0} Nüsha'}"
+                                               FontFamily="{StaticResource Font.Family.Mono}" FontSize="11.5" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                    <TextBlock Text="{Binding SelectedCirculationBook.ShelfLocation, StringFormat='Raf: {0}'}"
+                                               FontFamily="{StaticResource Font.Family.Mono}" FontSize="11.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Step 3: Due Date & Loan Terms Configuration -->
+                    <StackPanel Grid.Row="2" Margin="0,0,0,14">
+                        <TextBlock Text="3. ADIM — TESLİM TARİHİ VE ÖDÜNÇ SÜRESİ" FontSize="11.5" FontWeight="Bold" Foreground="{StaticResource Brush.Accent.Primary}" Margin="0,0,0,8" />
+
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <DatePicker Grid.Column="0"
+                                        SelectedDate="{Binding CirculationDueDate, Mode=TwoWay}"
+                                        Height="34"
+                                        VerticalContentAlignment="Center" />
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <Button Content="7 Gün"
+                                        Style="{StaticResource Button.Secondary}"
+                                        Command="{Binding SetLoanDurationDaysCommand}"
+                                        CommandParameter="7"
+                                        Margin="0,0,6,0" />
+                                <Button Content="15 Gün (Standart)"
+                                        Style="{StaticResource Button.Secondary}"
+                                        Command="{Binding SetLoanDurationDaysCommand}"
+                                        CommandParameter="15"
+                                        Margin="0,0,6,0" />
+                                <Button Content="30 Gün (Akademik)"
+                                        Style="{StaticResource Button.Secondary}"
+                                        Command="{Binding SetLoanDurationDaysCommand}"
+                                        CommandParameter="30" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="Banko İşlem Notu (İsteğe Bağlı)" Style="{StaticResource Text.Label}" />
+                        <TextBox Text="{Binding CirculationNotes, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource Input.TextBox}" />
+                    </StackPanel>
+
+                    <!-- Circulation Rules & Summary Box -->
+                    <Border Grid.Row="3" Style="{StaticResource Panel.SubtleWell}" Padding="14,12" Margin="0,0,0,14" VerticalAlignment="Top">
+                        <StackPanel>
+                            <TextBlock Text="OTOMATİK KURAL VE UYGUNLUK KONTROLÜ" FontSize="11" FontWeight="Bold" Foreground="{StaticResource Brush.Text.Secondary}" Margin="0,0,0,6" />
+                            <TextBlock FontSize="12" Foreground="{StaticResource Brush.Text.Primary}" Margin="0,0,0,4">
+                                <Run Text="• Seçili Okur: " Foreground="{StaticResource Brush.Text.Secondary}" />
+                                <Run Text="{Binding SelectedCirculationMember.FullName, Mode=OneWay}" FontWeight="SemiBold" />
+                                <Run Text=" (" /><Run Text="{Binding SelectedCirculationMember.QuotaRatioText, Mode=OneWay}" FontFamily="{StaticResource Font.Family.Mono}" /><Run Text=" kota kullanımda)" />
+                            </TextBlock>
+                            <TextBlock FontSize="12" Foreground="{StaticResource Brush.Text.Primary}" Margin="0,0,0,4">
+                                <Run Text="• Seçili Eser: " Foreground="{StaticResource Brush.Text.Secondary}" />
+                                <Run Text="{Binding SelectedCirculationBook.Title, Mode=OneWay}" FontWeight="SemiBold" />
+                                <Run Text=" — ISBN: " /><Run Text="{Binding SelectedCirculationBook.Isbn, Mode=OneWay}" FontFamily="{StaticResource Font.Family.Mono}" />
+                            </TextBlock>
+                            <TextBlock FontSize="12" Foreground="{StaticResource Brush.Text.Primary}">
+                                <Run Text="• Son İade Tarihi: " Foreground="{StaticResource Brush.Text.Secondary}" />
+                                <Run Text="{Binding CirculationDueDate, Mode=OneWay, StringFormat='{}{0:dd MMMM yyyy dddd}'}" FontWeight="SemiBold" Foreground="{StaticResource Brush.Accent.Primary}" />
+                                <Run Text="  |  Yetkili: " Foreground="{StaticResource Brush.Text.Secondary}" />
+                                <Run Text="{Binding CurrentUser.FullName, Mode=OneWay}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Primary Commit Button -->
+                    <Button Grid.Row="4"
+                            Content="✓ ÖDÜNÇ VERME İŞLEMİNİ TAMAMLA VE KAYDET"
+                            Style="{StaticResource Button.Primary}"
+                            Height="42"
+                            FontSize="13.5"
+                            Command="{Binding ExecuteBorrowCommand}" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ==================== MODE B: RAPID RETURN & RENEWAL SCANNER DESK ==================== -->
+        <Border Grid.Row="2"
+                Style="{StaticResource Panel.Section}"
+                Visibility="{Binding CirculationMode, Converter={StaticResource ScreenVisConverter}, ConverterParameter=RapidReturn}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="62" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="{StaticResource Brush.Surface.Subtle}" BorderBrush="{StaticResource Brush.Border.Default}" BorderThickness="0,0,0,1" Padding="16,0">
+                    <Grid VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="460" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding RapidReturnQuery, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource Input.TextBox}"
+                                 ToolTip="İade alınacak kitabın barkodunu, ISBN numarasını veya üye adını girin" />
+                        <TextBlock Grid.Column="2"
+                                   Text="Barkod okuyucu veya klavye ile kitap/üye arayın ve tek tıklamayla iade veya süre uzatma işlemini tamamlayın."
+                                   FontSize="12"
+                                   Foreground="{StaticResource Brush.Text.Secondary}"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <DataGrid Grid.Row="1"
+                          ItemsSource="{Binding ActiveLoansForReturnList}"
+                          Style="{StaticResource Grid.Archival}"
+                          BorderThickness="0"
+                          RowHeight="46">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="İŞLEM KODU" Binding="{Binding TransactionCode, Mode=OneWay}" Width="120" FontFamily="{StaticResource Font.Family.Mono}" FontSize="11.5" />
+                        <DataGridTemplateColumn Header="KİTAP ADI VE DEMİRBAŞ BARKODU" Width="1.8*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding BookTitle}" FontWeight="SemiBold" FontSize="13" />
+                                        <TextBlock FontSize="11" Foreground="{StaticResource Brush.Text.Secondary}">
+                                            <Run Text="{Binding BookBarcode, Mode=OneWay}" FontFamily="{StaticResource Font.Family.Mono}" />
+                                            <Run Text=" • Raf: " />
+                                            <Run Text="{Binding ShelfLocation, Mode=OneWay}" FontFamily="{StaticResource Font.Family.Mono}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="ÖDÜNÇ ALAN ÜYE" Width="1.4*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding MemberName}" FontWeight="Medium" FontSize="12.5" />
+                                        <TextBlock Text="{Binding MemberNumber}" FontFamily="{StaticResource Font.Family.Mono}" FontSize="11" Foreground="{StaticResource Brush.Text.Muted}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="VERİLİŞ TARİHİ" Binding="{Binding BorrowDateText, Mode=OneWay}" Width="105" FontFamily="{StaticResource Font.Family.Mono}" FontSize="12" />
+                        <DataGridTextColumn Header="SON TESLİM" Binding="{Binding DueDateText, Mode=OneWay}" Width="105" FontFamily="{StaticResource Font.Family.Mono}" FontSize="12" />
+                        <DataGridTemplateColumn Header="TESLİM DURUMU" Width="135">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Background="{Binding StatusKind, Converter={StaticResource StatusBgConverter}}"
+                                            BorderBrush="{Binding StatusKind, Converter={StaticResource StatusBorderConverter}}"
+                                            BorderThickness="1" CornerRadius="3" Padding="7,2" HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding DueStatusLabel}"
+                                                   Foreground="{Binding StatusKind, Converter={StaticResource StatusFgConverter}}"
+                                                   FontSize="11" FontWeight="SemiBold" />
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="GECİKME BEDELİ" Binding="{Binding CalculatedFineText, Mode=OneWay}" Width="110" FontFamily="{StaticResource Font.Family.Mono}" FontSize="12" />
+                        <DataGridTemplateColumn Header="HIZLI BANKO İŞLEMİ" Width="185">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="✓ İade Al"
+                                                Style="{StaticResource Button.CompactPrimary}"
+                                                Command="{Binding DataContext.ProcessReturnCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                Margin="0,0,6,0" />
+                                        <Button Content="Süre Uzat (+15g)"
+                                                Style="{StaticResource Button.Compact}"
+                                                Command="{Binding DataContext.ProcessRenewalCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
+

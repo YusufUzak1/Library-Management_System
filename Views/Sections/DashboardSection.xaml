@@ -1,0 +1,400 @@
+﻿<UserControl x:Class="Scriptorium.Views.Sections.DashboardSection"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- ==================== 1. UNIFIED 6-COLUMN ARCHITECTURAL KPI LEDGER ==================== -->
+        <Border Grid.Row="0" Style="{StaticResource Panel.Section}">
+            <Grid Height="92">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- KPI 1: Toplam Kitap / Nüsha -->
+                <Grid Grid.Column="0" Margin="18,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="TOPLAM ENVANTER (NÜSHA)" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Brush.Text.Secondary}" />
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding TotalPhysicalCopiesCount}" Style="{StaticResource Text.KpiValue}" />
+                        <TextBlock Text="{Binding TotalTitlesCount, StringFormat=' ({0} Başlık)'}" FontSize="12" Foreground="{StaticResource Brush.Text.Muted}" VerticalAlignment="Bottom" Margin="6,0,0,3" />
+                    </StackPanel>
+                    <TextBlock Grid.Row="2" Text="Kataloglanmış koleksiyon" FontSize="11.5" Foreground="{StaticResource Brush.Text.Muted}" />
+                </Grid>
+
+                <Rectangle Grid.Column="1" Fill="{StaticResource Brush.Border.Default}" Margin="0,12" />
+
+                <!-- KPI 2: Rafta Mevcut -->
+                <Grid Grid.Column="2" Margin="18,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="RAFTA MEVCUT KİTAP" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Brush.Status.SuccessText}" />
+                    <TextBlock Grid.Row="1" Text="{Binding AvailableCopiesCount}" Style="{StaticResource Text.KpiValue}" Foreground="{StaticResource Brush.Status.SuccessText}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="2" Text="{Binding AvailabilityPercentageText}" FontSize="11.5" Foreground="{StaticResource Brush.Text.Secondary}" />
+                </Grid>
+
+                <Rectangle Grid.Column="3" Fill="{StaticResource Brush.Border.Default}" Margin="0,12" />
+
+                <!-- KPI 3: Ödünçteki Kitaplar -->
+                <Grid Grid.Column="4" Margin="18,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="ÖDÜNÇTEKİ KİTAPLAR" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Brush.Status.InfoText}" />
+                    <TextBlock Grid.Row="1" Text="{Binding BorrowedCopiesCount}" Style="{StaticResource Text.KpiValue}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="2" Text="{Binding CirculationPercentageText}" FontSize="11.5" Foreground="{StaticResource Brush.Text.Secondary}" />
+                </Grid>
+
+                <Rectangle Grid.Column="5" Fill="{StaticResource Brush.Border.Default}" Margin="0,12" />
+
+                <!-- KPI 4: Kayıtlı Üyeler -->
+                <Grid Grid.Column="6" Margin="18,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="KAYITLI KÜTÜPHANE ÜYESİ" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Brush.Text.Secondary}" />
+                    <TextBlock Grid.Row="1" Text="{Binding RegisteredMembersCount}" Style="{StaticResource Text.KpiValue}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="2" Text="{Binding ActiveMembersCount, StringFormat='{}{0} aktif okur kartı'}" FontSize="11.5" Foreground="{StaticResource Brush.Text.Muted}" />
+                </Grid>
+
+                <Rectangle Grid.Column="7" Fill="{StaticResource Brush.Border.Default}" Margin="0,12" />
+
+                <!-- KPI 5: Bugün Teslim Beklenen -->
+                <Grid Grid.Column="8" Margin="18,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="BUGÜN TESLİM BEKLENEN" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Brush.Status.WarningText}" />
+                    <TextBlock Grid.Row="1" Text="{Binding DueTodayCount}" Style="{StaticResource Text.KpiValue}" Foreground="{StaticResource Brush.Status.WarningText}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Row="2" Text="{Binding ActiveReservationsCount, StringFormat='{}{0} aktif rezervasyon sırası'}" FontSize="11.5" Foreground="{StaticResource Brush.Text.Secondary}" />
+                </Grid>
+
+                <Rectangle Grid.Column="9" Fill="{StaticResource Brush.Border.Default}" Margin="0,12" />
+
+                <!-- KPI 6: Gecikmiş Kitaplar (Urgent Accent) -->
+                <Border Grid.Column="10" Background="#FCF6F6" CornerRadius="0,3,3,0">
+                    <Grid Margin="18,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <DockPanel>
+                            <TextBlock Text="GECİKMİŞ KİTAPLAR" FontSize="11" FontWeight="Bold" Foreground="{StaticResource Brush.Status.DangerText}" />
+                            <Button Content="İncele →"
+                                    Command="{Binding NavigateCommand}"
+                                    CommandParameter="Overdue"
+                                    HorizontalAlignment="Right"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    FontSize="11"
+                                    FontWeight="SemiBold"
+                                    Foreground="{StaticResource Brush.Status.DangerText}"
+                                    Cursor="Hand" />
+                        </DockPanel>
+                        <TextBlock Grid.Row="1" Text="{Binding OverdueBooksCount}" Style="{StaticResource Text.KpiValue}" Foreground="{StaticResource Brush.Status.DangerText}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="2" Text="{Binding CriticalOverdueCount, StringFormat='{}{0} nüsha >7 gün gecikmeli'}" FontSize="11.5" Foreground="{StaticResource Brush.Status.DangerText}" />
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- ==================== 2. MAIN WORKSPACE SPLIT (LEFT 2/3, RIGHT 1/3) ==================== -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.85*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT COLUMN: MONTHLY ANALYTICS CHART + RECENT CIRCULATION LEDGER -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="245" />
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Monthly Borrowing & Return Statistics Chart -->
+                <Border Grid.Row="0" Style="{StaticResource Panel.Section}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="42" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" BorderBrush="{StaticResource Brush.Border.Subtle}" BorderThickness="0,0,0,1" Padding="16,0">
+                            <DockPanel VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="AYLIK ÖDÜNÇ VERME VE İADE İSTATİSTİKLERİ (SON 12 AY)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource Brush.Text.Primary}" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Rectangle Width="10" Height="10" RadiusX="2" RadiusY="2" Fill="{StaticResource Brush.Accent.Primary}" Margin="0,0,5,0" />
+                                    <TextBlock Text="Ödünç Verilen" FontSize="11.5" Foreground="{StaticResource Brush.Text.Secondary}" Margin="0,0,14,0" />
+                                    <Rectangle Width="10" Height="10" RadiusX="2" RadiusY="2" Fill="{StaticResource Brush.Accent.Secondary}" Margin="0,0,5,0" />
+                                    <TextBlock Text="İade Alınan" FontSize="11.5" Foreground="{StaticResource Brush.Text.Secondary}" />
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding MonthlyStatsList}" Margin="16,12,16,10">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="12" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="3,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="22" />
+                                        </Grid.RowDefinitions>
+                                        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                                            <Border Width="11"
+                                                    Height="{Binding BorrowBarHeight}"
+                                                    MaxHeight="145"
+                                                    Background="{StaticResource Brush.Accent.Primary}"
+                                                    CornerRadius="2,2,0,0"
+                                                    Margin="0,0,2,0"
+                                                    ToolTip="{Binding BorrowedCount, StringFormat='Ödünç: {0} kitap'}" />
+                                            <Border Width="11"
+                                                    Height="{Binding ReturnBarHeight}"
+                                                    MaxHeight="145"
+                                                    Background="{StaticResource Brush.Accent.Secondary}"
+                                                    CornerRadius="2,2,0,0"
+                                                    ToolTip="{Binding ReturnedCount, StringFormat='İade: {0} kitap'}" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Row="1"
+                                                   Text="{Binding ShortMonth}"
+                                                   FontSize="11"
+                                                   FontWeight="Medium"
+                                                   Foreground="{StaticResource Brush.Text.Secondary}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Bottom" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+
+                <!-- Recent Borrowing & Returns Activity Ledger -->
+                <Border Grid.Row="2" Style="{StaticResource Panel.Section}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="44" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" BorderBrush="{StaticResource Brush.Border.Subtle}" BorderThickness="0,0,0,1" Padding="16,0">
+                            <DockPanel VerticalAlignment="Center">
+                                <TextBlock Text="SON DOLAŞIM HAREKETLERİ (ÖDÜNÇ VE İADELER)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource Brush.Text.Primary}" VerticalAlignment="Center" />
+                                <Button Content="+ Yeni Ödünç / İade İşlemi"
+                                        Style="{StaticResource Button.CompactPrimary}"
+                                        Command="{Binding NavigateCommand}"
+                                        CommandParameter="Circulation"
+                                        HorizontalAlignment="Right" />
+                            </DockPanel>
+                        </Border>
+
+                        <DataGrid Grid.Row="1"
+                                  ItemsSource="{Binding RecentActivityList}"
+                                  Style="{StaticResource Grid.Archival}"
+                                  BorderThickness="0"
+                                  RowHeight="40">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="İŞLEM KODU" Binding="{Binding TransactionCode, Mode=OneWay}" Width="118" FontFamily="{StaticResource Font.Family.Mono}" FontSize="11.5" />
+                                <DataGridTemplateColumn Header="KİTAP ADI VE YAZAR" Width="1.6*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding BookTitle}" FontWeight="SemiBold" FontSize="12.5" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding BookAuthor}" FontSize="11" Foreground="{StaticResource Brush.Text.Secondary}" TextTrimming="CharacterEllipsis" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="ÜYE BİLGİSİ" Width="1.2*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding MemberName}" FontSize="12.5" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding MemberNumber}" FontFamily="{StaticResource Font.Family.Mono}" FontSize="11" Foreground="{StaticResource Brush.Text.Muted}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="VERİLİŞ" Binding="{Binding BorrowDateText, Mode=OneWay}" Width="88" FontFamily="{StaticResource Font.Family.Mono}" FontSize="11.5" />
+                                <DataGridTextColumn Header="SON TESLİM" Binding="{Binding DueDateText, Mode=OneWay}" Width="88" FontFamily="{StaticResource Font.Family.Mono}" FontSize="11.5" />
+                                <DataGridTemplateColumn Header="DURUM" Width="135">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{Binding StatusKind, Converter={StaticResource StatusBgConverter}}"
+                                                    BorderBrush="{Binding StatusKind, Converter={StaticResource StatusBorderConverter}}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="3"
+                                                    Padding="7,2"
+                                                    HorizontalAlignment="Left">
+                                                <TextBlock Text="{Binding DueStatusLabel}"
+                                                           Foreground="{Binding StatusKind, Converter={StaticResource StatusFgConverter}}"
+                                                           FontSize="11"
+                                                           FontWeight="SemiBold" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- RIGHT COLUMN: DUE TODAY & URGENT TRIAGE + MOST BORROWED BOOKS -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1.1*" />
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+
+                <!-- Urgent Triage: Due Today & Overdue Action Queue -->
+                <Border Grid.Row="0" Style="{StaticResource Panel.Section}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="42" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Background="{StaticResource Brush.Surface.Subtle}" BorderBrush="{StaticResource Brush.Border.Default}" BorderThickness="0,0,0,1" Padding="14,0">
+                            <DockPanel VerticalAlignment="Center">
+                                <TextBlock Text="BUGÜN TESLİM &amp; ACİL İADE TAKİBİ" FontSize="11.5" FontWeight="Bold" Foreground="{StaticResource Brush.Text.Primary}" VerticalAlignment="Center" />
+                                <Border Background="{StaticResource Brush.Status.DangerBg}" BorderBrush="{StaticResource Brush.Status.DangerBorder}" BorderThickness="1" CornerRadius="3" Padding="6,1" HorizontalAlignment="Right">
+                                    <TextBlock Text="{Binding DueTodayAndUrgentList.Count, StringFormat='{}{0} Kayıt'}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Brush.Status.DangerText}" />
+                                </Border>
+                            </DockPanel>
+                        </Border>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding DueTodayAndUrgentList}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{StaticResource Brush.Border.Subtle}" BorderThickness="0,0,0,1" Padding="14,9">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                                    <TextBlock Text="{Binding BookTitle}" FontWeight="SemiBold" FontSize="12.5" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock FontSize="11.5" Foreground="{StaticResource Brush.Text.Secondary}" Margin="0,2,0,0">
+                                                        <Run Text="{Binding MemberName, Mode=OneWay}" />
+                                                        <Run Text=" • " />
+                                                        <Run Text="{Binding DueStatusLabel, Mode=OneWay}" FontWeight="SemiBold" Foreground="{Binding StatusKind, Converter={StaticResource StatusFgConverter}}" />
+                                                    </TextBlock>
+                                                </StackPanel>
+                                                <Button Grid.Column="1"
+                                                        Content="İade Al"
+                                                        Style="{StaticResource Button.Compact}"
+                                                        Command="{Binding DataContext.ProcessReturnCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!-- Most Borrowed Classics Leaderboard -->
+                <Border Grid.Row="2" Style="{StaticResource Panel.Section}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="42" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" BorderBrush="{StaticResource Brush.Border.Subtle}" BorderThickness="0,0,0,1" Padding="14,0">
+                            <DockPanel VerticalAlignment="Center">
+                                <TextBlock Text="EN ÇOK ÖDÜNÇ ALINAN ESERLER" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource Brush.Text.Primary}" VerticalAlignment="Center" />
+                                <Button Content="Kataloğa Git →"
+                                        Command="{Binding NavigateCommand}"
+                                        CommandParameter="Catalog"
+                                        HorizontalAlignment="Right"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        FontSize="11.5"
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource Brush.Accent.Primary}"
+                                        Cursor="Hand" />
+                            </DockPanel>
+                        </Border>
+
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding MostBorrowedBooksList}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{StaticResource Brush.Border.Subtle}" BorderThickness="0,0,0,1" Padding="14,8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="26" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border Grid.Column="0" Width="22" Height="30" CornerRadius="2"
+                                                        Background="{Binding CoverHex, Converter={StaticResource HexToBrushConverter}}"
+                                                        HorizontalAlignment="Left">
+                                                    <TextBlock Text="{Binding CoverInitials}" FontSize="9" FontWeight="Bold" Foreground="#F6F4EF" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+
+                                                <StackPanel Grid.Column="1" Margin="8,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="12.5" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{Binding AuthorName}" FontSize="11" Foreground="{StaticResource Brush.Text.Secondary}" TextTrimming="CharacterEllipsis" />
+                                                </StackPanel>
+
+                                                <Border Grid.Column="2" Background="{StaticResource Brush.Accent.SecondarySubtle}" CornerRadius="3" Padding="7,3" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding TotalBorrowCount, StringFormat='{}{0} ödünç'}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Brush.Accent.Secondary}" />
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>
+

@@ -1,0 +1,239 @@
+﻿<UserControl x:Class="Scriptorium.Views.Sections.CollectionMetaSection"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <!-- ==================== 1. AUTHORS SCREEN ==================== -->
+        <Grid Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVisConverter}, ConverterParameter=Authors}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="385" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource Panel.Section}">
+                <DataGrid ItemsSource="{Binding AuthorsList}"
+                          SelectedItem="{Binding SelectedAuthor, Mode=TwoWay}"
+                          Style="{StaticResource Grid.Archival}"
+                          BorderThickness="0"
+                          RowHeight="48">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="YAZAR ADI SOYADI" Width="1.6*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding FullName}" FontWeight="SemiBold" FontSize="13.5" />
+                                        <TextBlock Text="{Binding LiteraryMovement}" FontSize="11.5" Foreground="{StaticResource Brush.Text.Secondary}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="ÜLKE" Binding="{Binding Country, Mode=OneWay}" Width="110" FontSize="12.5" />
+                        <DataGridTextColumn Header="DÖNEM / YILLAR" Binding="{Binding BirthDeathYears, Mode=OneWay}" Width="135" FontFamily="{StaticResource Font.Family.Mono}" FontSize="12" />
+                        <DataGridTextColumn Header="BAŞLIK SAYISI" Binding="{Binding BookCount, StringFormat='{}{0} Eser'}" Width="115" FontFamily="{StaticResource Font.Family.Mono}" FontWeight="SemiBold" FontSize="12" />
+                        <DataGridTextColumn Header="TOPLAM NÜSHA" Binding="{Binding TotalCopies, StringFormat='{}{0} Nüsha'}" Width="115" FontFamily="{StaticResource Font.Family.Mono}" FontSize="12" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource Panel.Section}" Padding="18,16">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,14">
+                        <TextBlock Text="YAZAR KÜNYE VE BİYOGRAFİ FORMU" FontSize="12" FontWeight="Bold" Foreground="{StaticResource Brush.Accent.Primary}" VerticalAlignment="Center" />
+                        <Button Content="+ Yeni Yazar"
+                                Style="{StaticResource Button.Compact}"
+                                Command="{Binding StartNewAuthorCommand}"
+                                HorizontalAlignment="Right" />
+                    </DockPanel>
+
+                    <TextBlock Text="Yazar Adı ve Soyadı *" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditableAuthor.FullName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource Input.TextBox}" Margin="0,0,0,10" />
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Ülke" Style="{StaticResource Text.Label}" />
+                            <TextBox Text="{Binding EditableAuthor.Country}" Style="{StaticResource Input.TextBox}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Doğum – Ölüm Yılları" Style="{StaticResource Text.Label}" />
+                            <TextBox Text="{Binding EditableAuthor.BirthDeathYears}" Style="{StaticResource Input.TextBox}" FontFamily="{StaticResource Font.Family.Mono}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Edebi Akım / Uzmanlık Alanı" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditableAuthor.LiteraryMovement}" Style="{StaticResource Input.TextBox}" Margin="0,0,0,10" />
+
+                    <TextBlock Text="Biyografi ve Eser Notları" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditableAuthor.Biography}"
+                             Style="{StaticResource Input.TextBox}"
+                             Height="110"
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             VerticalContentAlignment="Top"
+                             Padding="8,6"
+                             Margin="0,0,0,14" />
+
+                    <Button Content="✓ Yazar Kaydını Kaydet"
+                            Style="{StaticResource Button.Primary}"
+                            Command="{Binding SaveAuthorCommand}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ==================== 2. CATEGORIES & DEWEY CLASSIFICATION SCREEN ==================== -->
+        <Grid Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVisConverter}, ConverterParameter=Categories}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="385" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource Panel.Section}">
+                <DataGrid ItemsSource="{Binding CategoriesList}"
+                          SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                          Style="{StaticResource Grid.Archival}"
+                          BorderThickness="0"
+                          RowHeight="48">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="DEWEY KODU" Binding="{Binding DeweyCode, Mode=OneWay}" Width="115" FontFamily="{StaticResource Font.Family.Mono}" FontWeight="Bold" FontSize="12.5" />
+                        <DataGridTemplateColumn Header="KATEGORİ ADI VE AÇIKLAMA" Width="2*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" />
+                                        <TextBlock Text="{Binding Description}" FontSize="11.5" Foreground="{StaticResource Brush.Text.Secondary}" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="SALON / KORİDOR" Binding="{Binding ShelfCorridor, Mode=OneWay}" Width="165" FontFamily="{StaticResource Font.Family.Mono}" FontSize="12" />
+                        <DataGridTextColumn Header="BAŞLIK" Binding="{Binding BookCount, StringFormat='{}{0} Eser'}" Width="95" FontFamily="{StaticResource Font.Family.Mono}" FontWeight="SemiBold" FontSize="12" />
+                        <DataGridTextColumn Header="TOPLAM NÜSHA" Binding="{Binding TotalCopies, StringFormat='{}{0} Nüsha'}" Width="110" FontFamily="{StaticResource Font.Family.Mono}" FontSize="12" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource Panel.Section}" Padding="18,16">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,14">
+                        <TextBlock Text="KATEGORİ VE RAF SINIFLANDIRMA" FontSize="12" FontWeight="Bold" Foreground="{StaticResource Brush.Accent.Primary}" VerticalAlignment="Center" />
+                        <Button Content="+ Yeni Kategori"
+                                Style="{StaticResource Button.Compact}"
+                                Command="{Binding StartNewCategoryCommand}"
+                                HorizontalAlignment="Right" />
+                    </DockPanel>
+
+                    <TextBlock Text="Dewey Onlu Sınıflama Kodu *" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditableCategory.DeweyCode}" Style="{StaticResource Input.TextBox}" FontFamily="{StaticResource Font.Family.Mono}" Margin="0,0,0,10" />
+
+                    <TextBlock Text="Kategori Adı *" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditableCategory.Name, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource Input.TextBox}" Margin="0,0,0,10" />
+
+                    <TextBlock Text="Salon ve Raf Koridoru" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditableCategory.ShelfCorridor}" Style="{StaticResource Input.TextBox}" Margin="0,0,0,10" />
+
+                    <TextBlock Text="Kapsam ve Kataloglama Açıklaması" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditableCategory.Description}"
+                             Style="{StaticResource Input.TextBox}"
+                             Height="95"
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             VerticalContentAlignment="Top"
+                             Padding="8,6"
+                             Margin="0,0,0,14" />
+
+                    <Button Content="✓ Kategori Bilgisini Kaydet"
+                            Style="{StaticResource Button.Primary}"
+                            Command="{Binding SaveCategoryCommand}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ==================== 3. PUBLISHERS SCREEN ==================== -->
+        <Grid Visibility="{Binding CurrentScreen, Converter={StaticResource ScreenVisConverter}, ConverterParameter=Publishers}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="385" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource Panel.Section}">
+                <DataGrid ItemsSource="{Binding PublishersList}"
+                          SelectedItem="{Binding SelectedPublisher, Mode=TwoWay}"
+                          Style="{StaticResource Grid.Archival}"
+                          BorderThickness="0"
+                          RowHeight="48">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="YAYINEVİ ADI VE NOT" Width="1.8*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" />
+                                        <TextBlock Text="{Binding Notes}" FontSize="11.5" Foreground="{StaticResource Brush.Text.Secondary}" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="ŞEHİR" Binding="{Binding City, Mode=OneWay}" Width="95" FontSize="12" />
+                        <DataGridTextColumn Header="KURULUŞ" Binding="{Binding FoundedYear, Mode=OneWay}" Width="85" FontFamily="{StaticResource Font.Family.Mono}" FontSize="12" />
+                        <DataGridTextColumn Header="İLETİŞİM E-POSTA" Binding="{Binding ContactEmail, Mode=OneWay}" Width="1.2*" FontSize="12" />
+                        <DataGridTextColumn Header="TELEFON" Binding="{Binding Phone, Mode=OneWay}" Width="125" FontFamily="{StaticResource Font.Family.Mono}" FontSize="11.5" />
+                        <DataGridTextColumn Header="ESER" Binding="{Binding BookCount, StringFormat='{}{0} Başlık'}" Width="95" FontFamily="{StaticResource Font.Family.Mono}" FontWeight="SemiBold" FontSize="12" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource Panel.Section}" Padding="18,16">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,14">
+                        <TextBlock Text="YAYINEVİ BİLGİLERİ FORMU" FontSize="12" FontWeight="Bold" Foreground="{StaticResource Brush.Accent.Primary}" VerticalAlignment="Center" />
+                        <Button Content="+ Yeni Yayınevi"
+                                Style="{StaticResource Button.Compact}"
+                                Command="{Binding StartNewPublisherCommand}"
+                                HorizontalAlignment="Right" />
+                    </DockPanel>
+
+                    <TextBlock Text="Yayınevi Resmi Unvanı *" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditablePublisher.Name, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource Input.TextBox}" Margin="0,0,0,10" />
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Merkez Şehir" Style="{StaticResource Text.Label}" />
+                            <TextBox Text="{Binding EditablePublisher.City}" Style="{StaticResource Input.TextBox}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Kuruluş Yılı" Style="{StaticResource Text.Label}" />
+                            <TextBox Text="{Binding EditablePublisher.FoundedYear}" Style="{StaticResource Input.TextBox}" FontFamily="{StaticResource Font.Family.Mono}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="E-Posta Adresi" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditablePublisher.ContactEmail}" Style="{StaticResource Input.TextBox}" Margin="0,0,0,10" />
+
+                    <TextBlock Text="Telefon" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditablePublisher.Phone}" Style="{StaticResource Input.TextBox}" FontFamily="{StaticResource Font.Family.Mono}" Margin="0,0,0,10" />
+
+                    <TextBlock Text="Web Sitesi" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditablePublisher.Website}" Style="{StaticResource Input.TextBox}" Margin="0,0,0,10" />
+
+                    <TextBlock Text="Tedarik ve Koleksiyon Notu" Style="{StaticResource Text.Label}" />
+                    <TextBox Text="{Binding EditablePublisher.Notes}" Style="{StaticResource Input.TextBox}" Margin="0,0,0,14" />
+
+                    <Button Content="✓ Yayınevi Kaydını Kaydet"
+                            Style="{StaticResource Button.Primary}"
+                            Command="{Binding SavePublisherCommand}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
+
