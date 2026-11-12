@@ -47,6 +47,7 @@ _ReSharper*/
 *.pubxml
 *.azurePubxml
 publish/
+publish_app/
 
 # Test results
 [Tt]est[Rr]esult*/
